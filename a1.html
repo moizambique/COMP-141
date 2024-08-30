@@ -1,0 +1,34 @@
+<html>
+    <head>
+        <title>JavaScript Example</title>   
+
+        <!-- JavaScript code is defined in the script tag below -->
+        <script type="text/javascript">
+            let variable1;
+            function first() {
+                variable1 = "hello";
+                variable2 = "hello";
+                variable3 = "hello";
+            }
+            function second() {
+                variable1 = 'A';
+                variable2 = 'A';
+                let variable3 = 'A';
+            }
+            function main() {
+                variable1 = 42;
+                let variable2 = 42;
+                variable3 = 42;
+                first();
+                second();
+                document.getElementById("result").innerHTML =
+                 "<p>variable1:" + variable1 + " variable2:" + variable2 + " variable3: " + variable3 + "</p>";
+            }
+            window.onload = main; //run the main function when the html page is loaded in a browser
+        </script>
+    </head>
+    <body>
+        <p>The final values of the variables are as follows</p>
+        <p id="result"></p> <!-- JavaScript code above defines the output for this paragraph with id result -->
+    </body>
+</html>
