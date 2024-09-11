@@ -29,9 +29,10 @@ int evaluate(int lhs, const string& op, int rhs) {
 
 void solveEquation(const string& input) {
     regex expr("(\\w+)\\s*(\\+|\\-|\\*|/)\\s*(\\w+)\\s*=\\s*(\\w+)");
+    regex expr1("(\\w+)\\s*=\\s*(\\w+)\\s*(\\+|\\-|\\*|/)\\s*(\\w+)");
     smatch match;
     
-    if (regex_match(input, match, expr)) {
+    if (regex_match(input, match, expr) || regex_match(input, match, expr1)) {
         string leftOperand = match[1];
         string op = match[2];
         string rightOperand = match[3];
