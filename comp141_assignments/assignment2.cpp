@@ -1,3 +1,4 @@
+// Shabbir Murtaza, Mohammed Saleh, Moiz Bukhari
 #include <iostream>
 #include <regex>
 using namespace std;
@@ -37,6 +38,36 @@ void solveEquation(const string& input) {
         string op = match[2];
         string rightOperand = match[3];
         string result = match[4];
+
+        // cout << isOperator(op) << endl;
+
+        if (!isOperator(op)){
+            rightOperand = match[4];
+            op = match[3];
+            result = match[2];
+
+            char temp = op[0];
+            switch (temp) {
+                case '+':
+                    op = "-";
+                    break;
+                case '-':
+                    op = "+";
+                    break;
+                case '*':
+                    op = "/";
+                    break;
+                case '/':
+                    op = "*";
+                    break;
+            }
+            // cout << leftOperand << " " << op << " " << rightOperand << " = " << result << endl;
+
+        }
+        // cout << leftOperand << endl;
+        // cout << op << endl;
+        // cout << rightOperand << endl;
+        // cout << result << endl;
 
         bool leftIsNumber = isNumber(leftOperand);
         bool rightIsNumber = isNumber(rightOperand);
