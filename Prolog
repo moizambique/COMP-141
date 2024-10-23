@@ -1,0 +1,205 @@
+%
+% debug code
+have(bow).
+have(arrow).
+%
+%
+
+
+
+
+%List of all the places
+place(river).
+place(cave).
+place(sinkhole).
+place(prairie).
+place(canyon).
+place(foothills).
+place(mountain).
+place(shop).
+place(dock).
+place(woods).
+place(forest).
+place(town).
+
+%connection to all the possible paths
+path(prairie, sinkhole).
+path(prairie, canyon).
+path(prairie, foothills).
+path(prairie, woods).
+path(foothills, mountain).
+path(foothills, town).
+path(town, shop).
+path(town, dock).
+path(town, woods).
+path(woods, forest).
+path(sinkhole, cave).
+path(cave, river).
+
+%list of items in the world
+item(hay).
+item(sword).
+item(arrow).
+item(bow).
+item(diamond).
+item(matches).
+
+%list of characters in the game linked with 
+char(wumpus).
+char(fisherman).
+char(blacksmith).
+char(troll).
+char(archer).
+
+%link characters and item to a place
+:- dynamic location/2.
+location(hay, woods).
+location(sword, shop).
+location(blacksmith, shop).
+location(fisherman, dock).
+location(troll, mountain).
+location(arrow, mountain).
+location(matches, foothills).
+location(bow, canyon).
+location(archer, canyon).
+location(diamond, river).
+location(wumpus, forest).
+
+%start location
+in(forest).
+
+:- dynamic have/1.
+
+
+pathway(X,Y) :- path(X,Y).
+pathway(X,Y) :- path(Y, X).
+
+:- dynamic in/1.
+% NP = newplace, OP = oldplace
+goto(NP) :- in(OP), 
+           pathway(OP, NP),  
+           retract(in(OP)),
+           asserta(in(NP)).
+
+ride(boat) :- 
+    in(river),
+    write('The boat takes you to dock'), nl,
+    retract(in(river)),
+    asserta(in(dock)).
+
+% inventory list your possesions
+/*
+inventory:-
+  have(_),                         % make sure you have at least one thing
+  write('You have: '),nl,
+  list_possessions.
+inventory:-
+  write('You have nothing'),nl.
+*/
+
+inventory :-
+    ( have(_) ->                        % Check if you have at least one thing
+        write('You have: '), nl,
+        list_possessions
+    ;                                   % Else
+        write('You have nothing'), nl
+    ).
+
+list_possessions:-
+  have(X),
+  tab(2),write(X),nl,
+  fail.
+list_possessions.
+
+fight(wumpus) :- 
+    in(forest),
+    have(bow),
+    have(arrow),
+    write('You have slayed the Wumpus'), nl, nl,
+    write('Congradulations, You have Won'), nl, nl,
+    retract(have(bow)),
+    retract(have(arrow)),
+    retract(location(wumpus, forest)),
+    termination(end).
+
+take(Item):-
+  is_here(Item),
+  is_takable(Item),
+  in(Location),
+  retract(location(Item, Location)),
+  asserta(have(Item)),
+  respond(['You now have the ',Item]).
+
+is_takable(Item):-                % you can not take the charater
+  char(Item),
+  respond(['You cannot pick up a ',Item]),
+  !,fail.
+is_takable(_).                     % not furniture, ok to take
+
+is_here(Item):-
+  in(Location),
+  location(Item,Location),!.          % do not backtrack
+is_here(Item):-
+  respond(['There is no ',Item,' here']),
+  fail.
+
+light(hay):-
+    in(cave),
+    have(hay),
+    have(matches),
+    write('You lighted up the cave.'), nl,
+    retract(have(hay)),
+    retract(have(matches)).
+
+look:-
+  in(Location),
+  respond(['You are in the ',Location]),
+  write('You can see the following things:'),nl,
+  list_things(Location),
+  write('You can go to the following rooms:'),nl,
+  list_connections(Location).
+
+list_things(Place):-
+  location(X,Place),
+  tab(2),write(X),nl,
+  fail.
+list_things(_).
+
+list_connections(Place):-
+  pathway(X, Place),
+  tab(2),write(X),nl,
+  fail.
+list_connections(_).
+
+
+% respond simplifies writing a mixture of literals and variables
+ 
+respond([]):-
+  write('.'),nl.
+respond([H|T]):-
+  write(H),
+  respond(T).
+
+do(take(X)):-take(X),!.
+do(light(X)):-light(X),!.
+do(fight(X)):-fight(X),!.
+do(go(X)) :- goto(X), in(X), !.
+do(end) :- write('Bye'), !.
+do(_) :- write('I do not know how to do that.'), nl, !.
+do(goto(X)) :- goto(X), !.
+   
+main :- 
+    write('Welcome to the Wumpus World'), nl,
+    look,
+    inventory,
+    repeat,
+    write('Enter a command: '),
+    read(X), nl,
+    do(X),
+    look,
+    inventory,
+    termination(X).
+termination(end).
+
+
+
